@@ -114,6 +114,8 @@ class Availability {
             $date_working_plan = $working_plan_exceptions[$date];
         }
 
+        $provider_timezone = new DateTimeZone($provider['timezone']);
+
         $periods = [];
 
         if (isset($date_working_plan['breaks']))
@@ -194,14 +196,17 @@ class Availability {
             {
                 $appointment_start = new DateTime($appointment['start_datetime']);
                 $appointment_end = new DateTime($appointment['end_datetime']);
+                $appointment_start->setTimezone($provider_timezone);
+                $appointment_end->setTimezone($provider_timezone);
 
                 if ($appointment_start >= $appointment_end)
                 {
                     continue;
                 }
 
-                $period_start = new DateTime($date . ' ' . $period['start']);
-                $period_end = new DateTime($date . ' ' . $period['end']);
+                $period_start = new DateTime($date . ' ' . $period['start'], $provider_timezone);
+                $period_end = new DateTime($date . ' ' . $period['end'], $provider_timezone);
+ 
 
                 if ($appointment_start <= $period_start && $appointment_end <= $period_end && $appointment_end <= $period_start)
                 {
